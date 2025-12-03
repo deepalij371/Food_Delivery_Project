@@ -1,0 +1,21 @@
+# Build artifacts
+target/
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+*.iml
+*.iws
+
+# Log files
+*.log
+
+# Node modules
+node_modules/
+npm-debug.log
+
+# Frontend build
+build/
+.DS_Store

@@ -1,0 +1,175 @@
+.restaurant-detail-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.restaurant-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 3rem 2rem;
+}
+
+.restaurant-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.restaurant-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.restaurant-info-text {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.95;
+}
+
+.restaurant-address-text,
+.restaurant-contact {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-bottom: 0.3rem;
+}
+
+.menu-section {
+  padding: 3rem 2rem;
+}
+
+.menu-title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.menu-item-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.menu-item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.menu-item-image {
+  height: 180px;
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.menu-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-menu-image {
+  font-size: 3rem;
+}
+
+.veg-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: white;
+  padding: 0.3rem 0.7rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.menu-item-info {
+  padding: 1.5rem;
+}
+
+.menu-item-name {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.menu-item-category {
+  display: inline-block;
+  background: #e9ecef;
+  color: #495057;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+}
+
+.menu-item-description {
+  color: #666;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.menu-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu-item-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.add-to-cart-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.unavailable-badge {
+  color: #dc3545;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.no-menu {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .restaurant-title {
+    font-size: 1.8rem;
+  }
+
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+}
