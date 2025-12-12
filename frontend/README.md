@@ -1,70 +1,198 @@
-# Getting Started with Create React App
+# FoodExpress Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, professional food delivery application frontend built with React, inspired by Swiggy's user experience.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+### 🎨 Modern UI/UX
+- **Swiggy-inspired design** with smooth animations and transitions
+- **Responsive layout** that works on all devices
+- **Professional color scheme** with orange primary colors
+- **Smooth animations** using Framer Motion
+- **Shimmer loading effects** for better perceived performance
 
-### `npm start`
+### 🛒 Shopping Experience
+- **Smart cart management** with quantity controls
+- **Restaurant-specific carts** (prevents mixing items from different restaurants)
+- **Real-time cart updates** with toast notifications
+- **Persistent cart** using localStorage
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🔍 Search & Filter
+- **Real-time search** for restaurants and cuisines
+- **Advanced filters**: Rating, Fast Delivery, Offers, Pure Veg, Price Range
+- **Category-based menu browsing**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🔐 Authentication
+- **Secure JWT-based authentication**
+- **Protected routes** for authenticated users
+- **User profile management**
+- **Order history tracking**
 
-### `npm test`
+### 📱 Components
+- **RestaurantCard** - Beautiful restaurant cards with ratings and offers
+- **MenuItemCard** - Interactive menu items with add to cart
+- **SearchBar** - Smart search with clear functionality
+- **FilterBar** - Multi-select filter chips
+- **Shimmer** - Loading placeholders for better UX
+- **Navbar** - Responsive navigation with cart badge
+- **Footer** - Professional footer with links
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Tech Stack
 
-### `npm run build`
+- **React 19.2.0** - Latest React with concurrent features
+- **React Router DOM 7.9.6** - Client-side routing
+- **Tailwind CSS 4.1.17** - Utility-first CSS framework
+- **Framer Motion 12.23.25** - Animation library
+- **Axios 1.13.2** - HTTP client
+- **React Hot Toast 2.4.1** - Toast notifications
+- **React Icons 5.5.0** - Icon library
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
+- Node.js 16+ and npm
+- Backend services running on port 8080
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Steps
 
-### `npm run eject`
+1. **Install dependencies**
+   ```bash
+   cd frontend
+   npm install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. **Start development server**
+   ```bash
+   npm start
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. **Build for production**
+   ```bash
+   npm run build
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The application will open at `http://localhost:3000`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Project Structure
 
-## Learn More
+```
+frontend/
+├── public/
+├── src/
+│   ├── components/
+│   │   ├── FilterBar.js          # Filter chips component
+│   │   ├── Footer.js             # Footer component
+│   │   ├── MenuItemCard.js       # Menu item with add to cart
+│   │   ├── Navbar.js             # Navigation bar
+│   │   ├── RestaurantCard.js     # Restaurant card component
+│   │   ├── SearchBar.js          # Search input component
+│   │   └── Shimmer.js            # Loading placeholders
+│   ├── context/
+│   │   ├── AuthContext.js        # Authentication state management
+│   │   └── CartContext.js        # Cart state management
+│   ├── pages/
+│   │   ├── CartPage.js           # Shopping cart page
+│   │   ├── HomePage.js           # Main landing page
+│   │   ├── LoginPage.js          # Login page
+│   │   ├── ProfilePage.js        # User profile & orders
+│   │   ├── RegisterPage.js       # Registration page
+│   │   └── RestaurantDetailPage.js # Restaurant menu page
+│   ├── App.js                    # Main app component
+│   ├── App.css                   # Global styles
+│   ├── index.js                  # Entry point
+│   └── index.css                 # Tailwind imports
+├── package.json
+└── tailwind.config.js            # Tailwind configuration
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Key Features Implementation
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Context API
+- **AuthContext**: Manages user authentication state, login, logout
+- **CartContext**: Manages cart items, quantities, restaurant info
 
-### Code Splitting
+### Protected Routes
+- Uses custom `ProtectedRoute` and `PublicRoute` components
+- Redirects based on authentication status
+- Shows loading state during auth check
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Cart Management
+- Prevents mixing items from different restaurants
+- Persistent storage using localStorage
+- Real-time quantity updates
+- Automatic total calculation with fees and taxes
 
-### Analyzing the Bundle Size
+### Responsive Design
+- Mobile-first approach
+- Hamburger menu for mobile devices
+- Grid layouts that adapt to screen size
+- Touch-friendly buttons and controls
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Color Scheme
 
-### Making a Progressive Web App
+```javascript
+Primary: #FC8019 (Orange)
+Success: #48C479 (Green)
+Warning: #FFC700 (Yellow)
+Dark: #111827 to #F9FAFB (Gray scale)
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## API Integration
 
-### Advanced Configuration
+The frontend expects the following API endpoints:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- `POST /api/users/register` - User registration
+- `POST /api/users/login` - User login
+- `GET /api/users/profile` - Get user profile
+- `GET /api/restaurants` - List all restaurants
+- `GET /api/restaurants/:id` - Get restaurant details
+- `GET /api/restaurants/:id/menu` - Get restaurant menu
+- `POST /api/orders` - Create new order
+- `GET /api/orders` - Get user orders
 
-### Deployment
+## Environment Variables
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+The app uses a proxy configuration in `package.json`:
+```json
+"proxy": "http://localhost:8080"
+```
 
-### `npm run build` fails to minify
+This proxies all API requests to the backend server.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Development Tips
+
+1. **Hot Reload**: Changes are automatically reflected
+2. **Console Errors**: Check browser console for errors
+3. **Network Tab**: Monitor API calls in browser DevTools
+4. **React DevTools**: Install React DevTools extension for debugging
+
+## Performance Optimizations
+
+- Lazy loading images with `loading="lazy"`
+- Shimmer effects for perceived performance
+- Optimized re-renders with proper state management
+- Memoization where needed
+- Code splitting with React.lazy (can be added)
+
+## Future Enhancements
+
+- [ ] Add payment gateway integration
+- [ ] Real-time order tracking with WebSocket
+- [ ] Push notifications
+- [ ] PWA support for offline functionality
+- [ ] Advanced search with autocomplete
+- [ ] Favorites/Wishlist feature
+- [ ] Rating and review system
+- [ ] Multiple delivery addresses
+- [ ] Coupon code system
+
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## License
+
+This project is for educational purposes.

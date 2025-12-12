@@ -1,147 +1,171 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './AuthPages.css';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 const RegisterPage = () => {
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    address: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+  };
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-        setError('');
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
+    try {
+      const response = await axios.post('/api/users/register', formData);
+      const { token, ...userData } = response.data;
+      
+      login(token, userData);
+      toast.success('Registration successful!');
+      navigate('/');
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match');
-            setLoading(false);
-            return;
-        }
-
-        if (formData.password.length < 6) {
-            setError('Password must be at least 6 characters long');
-            setLoading(false);
-            return;
-        }
-
-        try {
-            const { confirmPassword, ...registerData } = formData;
-            const response = await axios.post('/api/users/register', registerData);
-            
-            if (response.data.success) {
-                navigate('/login');
-            }
-        } catch (error) {
-            console.error('Registration error:', error);
-            const errorMessage = error.response?.data?.message || 
-                                error.response?.data?.data?.username || 
-                                error.response?.data?.data?.email ||
-                                'Registration failed. Please try again.';
-            setError(errorMessage);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <div className="auth-page">
-            <div className="auth-container">
-                <div className="auth-card">
-                    <h1 className="auth-title">Create Account</h1>
-                    <p className="auth-subtitle">Sign up to get started</p>
-
-                    {error && <div className="error-alert">{error}</div>}
-
-                    <form onSubmit={handleSubmit} className="auth-form">
-                        <div className="form-group">
-                            <label htmlFor="username">Username</label>
-                            <input
-                                type="text"
-                                id="username"
-                                name="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                required
-                                minLength="3"
-                                placeholder="Choose a username"
-                                className="form-input"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="email">Email</label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                                placeholder="Enter your email"
-                                className="form-input"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="password">Password</label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                                minLength="6"
-                                placeholder="Create a password"
-                                className="form-input"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="confirmPassword">Confirm Password</label>
-                            <input
-                                type="password"
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                required
-                                placeholder="Confirm your password"
-                                className="form-input"
-                            />
-                        </div>
-
-                        <button 
-                            type="submit" 
-                            className="auth-button"
-                            disabled={loading}
-                        >
-                            {loading ? 'Creating Account...' : 'Sign Up'}
-                        </button>
-                    </form>
-
-                    <p className="auth-footer">
-                        Already have an account? <Link to="/login" className="auth-link">Login</Link>
-                    </p>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white flex items-center justify-center px-4 py-12">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md w-full"
+      >
+        <div className="text-center mb-8">
+          <Link to="/" className="text-3xl font-bold text-primary-500">
+            FoodExpress
+          </Link>
+          <h2 className="mt-6 text-3xl font-bold text-gray-800">Create your account</h2>
+          <p className="mt-2 text-gray-600">Join us and start ordering</p>
         </div>
-    );
+
+        <div className="bg-white rounded-lg shadow-card p-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                Full Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your full name"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your phone number"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+                Address
+              </label>
+              <textarea
+                id="address"
+                name="address"
+                rows="2"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your delivery address"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Create a password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary-500 text-white py-3 rounded-lg hover:bg-primary-600 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Creating account...' : 'Sign Up'}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Already have an account?{' '}
+              <Link to="/login" className="text-primary-500 hover:text-primary-600 font-semibold">
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <Link to="/" className="text-gray-600 hover:text-primary-500 text-sm">
+            ← Back to home
+          </Link>
+        </div>
+      </motion.div>
+    </div>
+  );
 };
 
 export default RegisterPage;

@@ -56,7 +56,10 @@ public class UserController {
         );
         
         final UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
-        final String token = jwtUtil.generateToken(userDetails.getUsername());
+        
+        // Fetch user to get role
+        User user = userService.findByUsername(loginRequest.getUsername());
+        final String token = jwtUtil.generateToken(userDetails.getUsername(), user.getRole());
         
         return ResponseEntity.ok(ApiResponse.success("Login successful", new LoginResponse(token)));
     }

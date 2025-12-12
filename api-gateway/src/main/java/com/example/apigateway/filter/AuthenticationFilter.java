@@ -44,13 +44,12 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 
                 // Extract claims and add to headers
                 Claims claims = jwtUtil.getAllClaimsFromToken(authHeader);
-                // Assuming the subject is the user ID or username
                 String userId = claims.getSubject(); 
+                String userRole = jwtUtil.getRoleFromToken(authHeader);
                 
                 ServerHttpRequest request = exchange.getRequest().mutate()
                         .header("X-User-Id", userId)
-                        // Add other claims if needed, e.g., roles
-                        // .header("X-User-Role", claims.get("role", String.class))
+                        .header("X-User-Role", userRole != null ? userRole : "CUSTOMER")
                         .build();
 
                 return chain.filter(exchange.mutate().request(request).build());

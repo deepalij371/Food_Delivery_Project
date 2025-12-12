@@ -33,6 +33,15 @@ public class RestaurantService {
         return restaurantRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with id: " + id));
     }
+    
+    public Restaurant updateRestaurant(Restaurant restaurant) {
+        return restaurantRepository.save(restaurant);
+    }
+    
+    public void deleteRestaurant(Long id) {
+        Restaurant restaurant = getRestaurantById(id);
+        restaurantRepository.delete(restaurant);
+    }
 
     public List<MenuItem> getMenuItems(Long restaurantId) {
         Restaurant restaurant = getRestaurantById(restaurantId);

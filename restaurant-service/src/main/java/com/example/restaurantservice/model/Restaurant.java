@@ -47,6 +47,9 @@ public class Restaurant {
     
     private Boolean isOpen = true;
 
+    @Column(name = "owner_id", nullable = false)
+    private String ownerId; // Username of the restaurant owner
+
     @Column(name = "delivery_time")
     private String deliveryTime;
 
