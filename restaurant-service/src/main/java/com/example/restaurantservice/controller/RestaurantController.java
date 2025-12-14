@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -17,7 +16,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class RestaurantController {
 
-    @Autowired
+    @Autowired   
     private RestaurantService restaurantService;
 
     @PostMapping
@@ -121,7 +120,8 @@ public class RestaurantController {
     }
 
     @GetMapping("/health")
-    public ResponseEntity<ApiResponse<String>> health() {
+    public ResponseEntity<ApiResponse<String>> health() 
+    {
         return ResponseEntity.ok(ApiResponse.success("Restaurant service is running"));
     }
 }

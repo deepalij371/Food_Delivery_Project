@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +47,7 @@ public class Restaurant {
     private Boolean isOpen = true;
 
     @Column(name = "owner_id", nullable = false)
-    private String ownerId; // Username of the restaurant owner
+    private String ownerId; 
 
     @Column(name = "delivery_time")
     private String deliveryTime;

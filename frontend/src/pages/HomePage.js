@@ -27,9 +27,7 @@ const HomePage = () => {
   const fetchRestaurants = async () => {
     try {
       const response = await axios.get('/api/restaurants');
-      // The API returns { success: true, message: "...", data: [...] }
-      // axios puts the body in response.data, so the array is in response.data.data
-      setRestaurants(response.data.data || []); 
+      setRestaurants(response.data.data || []);
       setFilteredRestaurants(response.data.data || []);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
@@ -84,87 +82,100 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
 
       {/* Hero Section */}
-      <div className="gradient-primary text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
+      <div
+        className="relative bg-gray-900 text-white py-24 md:py-32"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1600")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-10"
+            className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight"
           >
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
-              Order food online from your favorite restaurants
-            </h1>
-            <p className="text-xl md:text-2xl text-white/95 mb-8">
-              Get your food delivered in minutes
-            </p>
-          </motion.div>
-
-          <motion.div
+            Delicious Food, <br className="hidden md:block" /> Delivered To You
+          </motion.h1>
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto"
+          >
+            Explore top-rated restaurants and cafes near you. Order now and satisfy your cravings in minutes.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
             className="flex justify-center"
           >
-            <SearchBar onSearch={setSearchQuery} />
+            <div className="w-full max-w-xl">
+              <SearchBar onSearch={setSearchQuery} />
+            </div>
           </motion.div>
         </div>
       </div>
 
-      {/* Category Carousel */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <CategoryCarousel onCategorySelect={(category) => setSearchQuery(category)} />
-      </div>
-
-      {/* Divider */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-t border-gray-200" />
+      {/* Category Section */}
+      <div className="bg-white py-12 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CategoryCarousel onCategorySelect={(category) => setSearchQuery(category)} />
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         {/* Filters */}
-        <div className="mb-8">
-          <FilterBar
-            activeFilters={activeFilters}
-            onFilterChange={handleFilterChange}
-          />
+        <div className="sticky top-20 z-30 bg-gray-50 py-4 mb-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-900">
+              {searchQuery ? `Results for "${searchQuery}"` : 'Top Restaurants'}
+            </h2>
+            <div className="text-sm text-gray-500 font-medium">
+              {filteredRestaurants.length} places
+            </div>
+          </div>
+          <div className="mt-4">
+            <FilterBar
+              activeFilters={activeFilters}
+              onFilterChange={handleFilterChange}
+            />
+          </div>
         </div>
 
         {/* Restaurants Grid */}
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            {searchQuery
-              ? `Search results for "${searchQuery}"`
-              : 'Top restaurants near you'}
-          </h2>
-          <p className="text-gray-600 mb-6">
-            {filteredRestaurants.length} restaurants found
-          </p>
-
           {loading ? (
             <ShimmerList count={8} />
           ) : filteredRestaurants.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {filteredRestaurants.map((restaurant) => (
                 <RestaurantCard key={restaurant.id} restaurant={restaurant} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <p className="text-gray-500 text-lg">No restaurants found</p>
+            <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
+              <div className="text-6xl mb-4">🍽️</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">No restaurants found</h3>
+              <p className="text-gray-500 mb-6">Try changing your search or filters to see more results.</p>
               <button
                 onClick={() => {
                   setSearchQuery('');
                   setActiveFilters([]);
                 }}
-                className="mt-4 text-primary-500 hover:text-primary-600 font-semibold"
+                className="px-6 py-2 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition"
               >
-                Clear filters
+                Clear all filters
               </button>
             </div>
           )}

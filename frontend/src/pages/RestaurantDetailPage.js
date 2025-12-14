@@ -26,7 +26,7 @@ const RestaurantDetailPage = () => {
   const fetchRestaurantDetails = async () => {
     try {
       const response = await axios.get(`/api/restaurants/${id}`);
-      setRestaurant(response.data);
+      setRestaurant(response.data.data);
     } catch (error) {
       console.error('Error fetching restaurant details:', error);
     }
@@ -35,7 +35,7 @@ const RestaurantDetailPage = () => {
   const fetchMenuItems = async () => {
     try {
       const response = await axios.get(`/api/restaurants/${id}/menu`);
-      setMenuItems(response.data);
+      setMenuItems(response.data.data || []);
     } catch (error) {
       console.error('Error fetching menu items:', error);
     } finally {
@@ -48,7 +48,7 @@ const RestaurantDetailPage = () => {
       addToCart(item, {
         id: restaurant.id,
         name: restaurant.name,
-        image: restaurant.image
+        image: restaurant.imageUrl
       });
     }
   };
@@ -113,14 +113,14 @@ const RestaurantDetailPage = () => {
         >
           <div className="flex flex-col md:flex-row gap-6">
             <img
-              src={restaurant.image || `https://source.unsplash.com/400x300/?restaurant,${restaurant.cuisine}`}
+              src={restaurant.imageUrl || `https://source.unsplash.com/400x300/?restaurant,${restaurant.cuisine}`}
               alt={restaurant.name}
               className="w-full md:w-48 h-48 object-cover rounded-lg"
             />
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-800 mb-2">{restaurant.name}</h1>
               <p className="text-gray-600 mb-4">{restaurant.cuisine}</p>
-              
+
               <div className="flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1 bg-success text-white px-2 py-1 rounded">
@@ -129,12 +129,12 @@ const RestaurantDetailPage = () => {
                   </div>
                   <span className="text-gray-600">1000+ ratings</span>
                 </div>
-                
+
                 <div className="flex items-center gap-2 text-gray-600">
                   <FiClock />
                   <span>{restaurant.deliveryTime || '30-35'} mins</span>
                 </div>
-                
+
                 <div className="flex items-center gap-2 text-gray-600">
                   <FiMapPin />
                   <span>{restaurant.address || 'Multiple locations'}</span>
@@ -157,11 +157,10 @@ const RestaurantDetailPage = () => {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
-                  selectedCategory === category
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
+                className={`px-4 py-2 rounded-full whitespace-nowrap transition ${selectedCategory === category
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
               >
                 {category}
               </button>
@@ -210,7 +209,6 @@ const RestaurantDetailPage = () => {
           </motion.div>
         )}
       </div>
-
       <Footer />
     </div>
   );

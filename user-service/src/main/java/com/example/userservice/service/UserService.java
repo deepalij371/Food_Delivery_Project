@@ -1,5 +1,6 @@
 package com.example.userservice.service;
 
+import com.example.userservice.dto.RegisterRequest;
 import com.example.userservice.exception.ResourceNotFoundException;
 import com.example.userservice.model.User;
 import com.example.userservice.repository.UserRepository;
@@ -10,22 +11,37 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    public User register(User user) {
-        if (user.getRole() == null || user.getRole().isEmpty()) {
+    public User register(RegisterRequest registerRequest) {
+        User user = new User();
+        // Use email as username for consistency
+        user.setUsername(registerRequest.getEmail());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        
+        user.setFullName(registerRequest.getName());
+        user.setPhone(registerRequest.getPhone());
+        user.setAddress(registerRequest.getAddress());
+        
+        if (registerRequest.getRole() == null || registerRequest.getRole().isEmpty()) {
             user.setRole("CUSTOMER");
+        } else {
+            user.setRole(registerRequest.getRole());
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
         return userRepository.save(user);
     }
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
     }
 }

@@ -44,8 +44,8 @@ public class RestaurantService {
     }
 
     public List<MenuItem> getMenuItems(Long restaurantId) {
-        Restaurant restaurant = getRestaurantById(restaurantId);
-        return restaurant.getMenuItems();
+        // Explicitly fetch from repository to ensure fresh data and avoid lazy loading issues
+        return menuItemRepository.findByRestaurantId(restaurantId);
     }
 
     public MenuItem addMenuItem(Long restaurantId, MenuItem menuItem) {

@@ -12,24 +12,26 @@ import RegisterPage from './pages/RegisterPage';
 import RestaurantDetailPage from './pages/RestaurantDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import CartPage from './pages/CartPage';
+import OrderTrackingPage from './pages/OrderTrackingPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-  
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
-  
+
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-  
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
-  
+
   return !isAuthenticated ? children : <Navigate to="/" />;
 };
 
@@ -89,6 +91,15 @@ function AppRoutes() {
           path="/cart"
           element={<CartPage />}
         />
+        <Route
+          path="/order/tracking/:id"
+          element={
+            <ProtectedRoute>
+              <OrderTrackingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );
