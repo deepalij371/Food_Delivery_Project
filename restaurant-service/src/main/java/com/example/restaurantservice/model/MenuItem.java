@@ -35,12 +35,12 @@ public class MenuItem {
     private Double price;
 
     private String category;
-    
+
     private String imageUrl;
     
     private Boolean isAvailable = true;
     
-    private Boolean isVegetarian = false;
+    private Boolean isVeg = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)

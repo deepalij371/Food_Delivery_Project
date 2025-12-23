@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import MenuItemCard from '../components/MenuItemCard';
@@ -17,6 +17,7 @@ const RestaurantDetailPage = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [isVegOnly, setIsVegOnly] = useState(false);
 
   useEffect(() => {
     fetchRestaurantDetails();
@@ -25,7 +26,7 @@ const RestaurantDetailPage = () => {
 
   const fetchRestaurantDetails = async () => {
     try {
-      const response = await axios.get(`/api/restaurants/${id}`);
+      const response = await api.get(`/restaurants/${id}`);
       setRestaurant(response.data.data);
     } catch (error) {
       console.error('Error fetching restaurant details:', error);
@@ -34,7 +35,7 @@ const RestaurantDetailPage = () => {
 
   const fetchMenuItems = async () => {
     try {
-      const response = await axios.get(`/api/restaurants/${id}/menu`);
+      const response = await api.get(`/restaurants/${id}/menu`);
       setMenuItems(response.data.data || []);
     } catch (error) {
       console.error('Error fetching menu items:', error);
@@ -59,9 +60,12 @@ const RestaurantDetailPage = () => {
   };
 
   const categories = ['All', ...new Set(menuItems.map(item => item.category || 'Other'))];
-  const filteredItems = selectedCategory === 'All'
-    ? menuItems
-    : menuItems.filter(item => (item.category || 'Other') === selectedCategory);
+
+  const filteredItems = menuItems.filter(item => {
+    const categoryMatch = selectedCategory === 'All' || (item.category || 'Other') === selectedCategory;
+    const vegMatch = !isVegOnly || item.isVeg;
+    return categoryMatch && vegMatch;
+  });
 
   if (loading) {
     return (
@@ -150,21 +154,39 @@ const RestaurantDetailPage = () => {
           </div>
         </motion.div>
 
-        {/* Category Tabs */}
-        <div className="mb-6 overflow-x-auto">
-          <div className="flex gap-2 pb-2">
-            {categories.map(category => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap transition ${selectedCategory === category
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+        {/* Menu Controls */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 sticky top-16 bg-gray-50/95 backdrop-blur-sm z-30 py-4 border-b border-gray-200">
+          {/* Category Tabs */}
+          <div className="overflow-x-auto">
+            <div className="flex gap-2">
+              {categories.map(category => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-full whitespace-nowrap transition text-sm font-medium ${selectedCategory === category
+                    ? 'bg-gray-800 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow-sm'
+                    }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Veg Only Toggle */}
+          <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200 w-fit">
+            <span className="text-sm font-bold text-gray-700">Veg Only</span>
+            <button
+              onClick={() => setIsVegOnly(!isVegOnly)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isVegOnly ? 'bg-success' : 'bg-gray-200'
+                }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isVegOnly ? 'translate-x-6' : 'translate-x-1'
                   }`}
-              >
-                {category}
-              </button>
-            ))}
+              />
+            </button>
           </div>
         </div>
 

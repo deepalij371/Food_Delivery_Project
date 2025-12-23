@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiShoppingCart, FiUser, FiLogOut, FiMenu, FiX, FiHelpCircle, FiTag } from 'react-icons/fi';
+import { FiShoppingCart, FiUser, FiLogOut, FiMenu, FiX, FiHelpCircle, FiTag, FiSearch } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import LocationSelector from './LocationSelector';
@@ -36,6 +36,11 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
+            <Link to="/search" className="flex items-center gap-2 text-gray-700 hover:text-primary-500 transition">
+              <FiSearch className="text-lg" />
+              <span className="font-medium">Search</span>
+            </Link>
+
             <Link to="/" className="flex items-center gap-2 text-gray-700 hover:text-primary-500 transition">
               <FiTag className="text-lg" />
               <span className="font-medium">Offers</span>

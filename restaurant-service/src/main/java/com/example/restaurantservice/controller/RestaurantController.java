@@ -37,9 +37,14 @@ public class RestaurantController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Restaurant>>> getAllRestaurants(
-            @RequestParam(required = false) String cuisine,
+            @RequestParam(required = false) String query,
             @RequestParam(required = false) Boolean isOpen) {
-        List<Restaurant> restaurants = restaurantService.getAllRestaurants();
+        List<Restaurant> restaurants;
+        if (query != null && !query.trim().isEmpty()) {
+            restaurants = restaurantService.searchRestaurants(query);
+        } else {
+            restaurants = restaurantService.getAllRestaurants();
+        }
         return ResponseEntity.ok(ApiResponse.success(restaurants));
     }
     

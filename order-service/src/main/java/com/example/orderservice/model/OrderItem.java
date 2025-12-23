@@ -24,6 +24,7 @@ public class OrderItem {
     private Long id;
 
     private Long menuItemId;
+    private String name;
     private Integer quantity;
     private Double price;
 

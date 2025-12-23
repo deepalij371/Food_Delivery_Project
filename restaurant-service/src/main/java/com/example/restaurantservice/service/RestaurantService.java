@@ -29,6 +29,13 @@ public class RestaurantService {
         return restaurantRepository.findAll();
     }
 
+    public List<Restaurant> searchRestaurants(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return getAllRestaurants();
+        }
+        return restaurantRepository.searchRestaurants(query);
+    }
+
     public Restaurant getRestaurantById(Long id) {
         return restaurantRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with id: " + id));

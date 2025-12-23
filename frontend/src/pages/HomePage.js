@@ -17,18 +17,25 @@ const HomePage = () => {
   const [activeFilters, setActiveFilters] = useState([]);
 
   useEffect(() => {
-    fetchRestaurants();
-  }, []);
+    // Debounce search
+    const timer = setTimeout(() => {
+      fetchRestaurants(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     applyFilters();
-  }, [searchQuery, activeFilters, restaurants]);
+  }, [restaurants, activeFilters]);
 
-  const fetchRestaurants = async () => {
+  const fetchRestaurants = async (query = '') => {
+    setLoading(true);
     try {
-      const response = await axios.get('/api/restaurants');
+      const url = query ? `/api/restaurants?query=${query}` : '/api/restaurants';
+      const response = await axios.get(url);
       setRestaurants(response.data.data || []);
-      setFilteredRestaurants(response.data.data || []);
+      // When fetching new data, we also reset or re-apply local filters (like veg/rating) 
+      // but 'filteredRestaurants' will be updated by the next useEffect on 'restaurants' change
     } catch (error) {
       console.error('Error fetching restaurants:', error);
     } finally {
@@ -39,13 +46,8 @@ const HomePage = () => {
   const applyFilters = () => {
     let filtered = [...restaurants];
 
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(restaurant =>
-        restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+    // Search is handled by backend now, so we don't filter by name/cuisine here anymore
+    // We only apply client-side filters (Rating, Veg, etc.) on the result returned by backend
 
     // Active filters
     activeFilters.forEach(filter => {

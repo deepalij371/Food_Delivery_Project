@@ -158,6 +158,16 @@ public class GatewayConfig {
                                 .filter(roleFilter.apply(c -> c.setAllowedRoles("ADMIN"))))
                         .uri("lb://order-service"))
                 
+                .route("payment-initiate", r -> r.path("/api/payments/initiate")
+                        .filters(f -> f.stripPrefix(1)
+                                .filter(authFilter.apply(new AuthenticationFilter.Config())))
+                        .uri("lb://order-service"))
+                
+                .route("payment-verify", r -> r.path("/api/payments/verify")
+                        .filters(f -> f.stripPrefix(1)
+                                .filter(authFilter.apply(new AuthenticationFilter.Config())))
+                        .uri("lb://order-service"))
+                
                 .build();
     }
 }

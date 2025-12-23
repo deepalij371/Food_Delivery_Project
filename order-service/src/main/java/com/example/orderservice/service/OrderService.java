@@ -16,7 +16,34 @@ public class OrderService {
     private OrderRepository orderRepository;
 
     public Order createOrder(Order order) {
-        order.setStatus("PENDING");
+        // Validate order object
+        if (order == null) {
+            throw new IllegalArgumentException("Order cannot be null");
+        }
+        
+        // Validate required fields
+        if (order.getCustomerId() == null || order.getCustomerId().isEmpty()) {
+            throw new IllegalArgumentException("Customer ID is required");
+        }
+        
+        if (order.getRestaurantId() == null) {
+            throw new IllegalArgumentException("Restaurant ID is required");
+        }
+        
+        // Default to PENDING_PAYMENT if not specified, as this is the start of the flow
+        if (order.getStatus() == null || order.getStatus().isEmpty()) {
+            order.setStatus("PENDING_PAYMENT");
+        }
+        
+        // Set creation timestamp if not set
+        if (order.getCreatedAt() == null) {
+            order.setCreatedAt(new java.util.Date());
+        }
+        
+        System.out.println("Creating order for customer: " + order.getCustomerId() + 
+                         ", restaurant: " + order.getRestaurantId() + 
+                         ", total: " + order.getTotalPrice());
+        
         return orderRepository.save(order);
     }
 
