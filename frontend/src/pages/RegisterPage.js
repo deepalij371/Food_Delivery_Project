@@ -30,14 +30,17 @@ const RegisterPage = () => {
 
     try {
       const response = await axios.post('/api/users/register', formData);
-      const { token, ...userData } = response.data;
-      
-      login(token, userData);
-      toast.success('Registration successful!');
-      navigate('/');
+      const apiResponse = response.data;
+
+      if (apiResponse.success) {
+        toast.success('Registration successful! Please login.');
+        navigate('/login');
+      } else {
+        throw new Error(apiResponse.message || 'Registration failed');
+      }
     } catch (error) {
       console.error('Registration error:', error);
-      toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
+      toast.error(error.message || error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }

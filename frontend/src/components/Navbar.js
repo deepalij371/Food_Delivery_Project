@@ -65,7 +65,7 @@ const Navbar = () => {
 
                 <Link to="/profile" className="flex items-center gap-2 text-gray-700 hover:text-primary-500 transition">
                   <FiUser className="text-xl" />
-                  <span className="font-medium">{user?.name || 'Profile'}</span>
+                  <span className="font-medium">{user?.fullName || user?.name || 'Profile'}</span>
                 </Link>
 
                 <button
@@ -143,7 +143,7 @@ const Navbar = () => {
                   className="flex items-center gap-3 py-2 text-gray-700 hover:text-primary-500"
                 >
                   <FiUser />
-                  <span>{user?.name || 'Profile'}</span>
+                  <span>{user?.fullName || user?.name || 'Profile'}</span>
                 </Link>
 
                 <button

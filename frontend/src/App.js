@@ -21,47 +21,50 @@ import NotFoundPage from './pages/NotFoundPage';
 
 // Components
 import ScrollToTop from './components/ScrollToTop';
+import GlobalErrorBoundary from './components/GlobalErrorBoundary';
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          <ScrollToTop />
-          <div className="App">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/payment/:orderId" element={<PaymentPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/order-tracking/:id" element={<OrderTrackingPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </div>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: '#333',
-                color: '#fff',
-              },
-              success: {
-                iconTheme: {
-                  primary: '#10b981',
-                  secondary: '#fff',
+    <Router>
+      <GlobalErrorBoundary>
+        <AuthProvider>
+          <CartProvider>
+            <ScrollToTop />
+            <div className="App">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/payment/:orderId" element={<PaymentPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/order-tracking/:id" element={<OrderTrackingPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </div>
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: '#333',
+                  color: '#fff',
                 },
-              },
-            }}
-          />
-        </Router>
-      </CartProvider>
-    </AuthProvider>
+                success: {
+                  iconTheme: {
+                    primary: '#10b981',
+                    secondary: '#fff',
+                  },
+                },
+              }}
+            />
+          </CartProvider>
+        </AuthProvider>
+      </GlobalErrorBoundary>
+    </Router>
   );
 }
 

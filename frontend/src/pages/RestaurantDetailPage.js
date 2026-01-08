@@ -193,19 +193,44 @@ const RestaurantDetailPage = () => {
         {/* Menu Items */}
         <div className="space-y-4">
           {filteredItems.length > 0 ? (
-            filteredItems.map(item => (
-              <MenuItemCard
-                key={item.id}
-                item={item}
-                onAdd={handleAddToCart}
-                quantity={getItemQuantity(item.id)}
-                onUpdateQuantity={updateQuantity}
-              />
-            ))
+            <motion.div
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              {filteredItems.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <MenuItemCard
+                    item={item}
+                    onAdd={handleAddToCart}
+                    quantity={getItemQuantity(item.id)}
+                    onUpdateQuantity={updateQuantity}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
           ) : (
-            <div className="text-center py-16 bg-white rounded-lg">
-              <p className="text-gray-500">No items in this category</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-16 bg-white rounded-lg border border-dashed border-gray-300"
+            >
+              <div className="text-4xl mb-4">🔍</div>
+              <p className="text-gray-500 font-medium">No items found matching your filters</p>
+              <button
+                onClick={() => { setSelectedCategory('All'); setIsVegOnly(false); }}
+                className="mt-4 text-primary-500 hover:text-primary-600 font-semibold underline"
+              >
+                Clear all filters
+              </button>
+            </motion.div>
           )}
         </div>
 

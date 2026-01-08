@@ -29,17 +29,20 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
         try {
             const response = await axios.post('/api/users/login', formData);
-            const { token, ...userData } = response.data;
+            const apiResponse = response.data;
 
-            login(token, userData);
-            toast.success('Login successful!');
-            navigate(from, { replace: true });
+            if (apiResponse.success && apiResponse.data?.token) {
+                login(apiResponse.data.token, apiResponse.data.user || null);
+                toast.success('Login successful!');
+                navigate(from, { replace: true });
+            } else {
+                throw new Error(apiResponse.message || 'Login failed');
+            }
         } catch (error) {
             console.error('Login error:', error);
-            toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
+            toast.error(error.message || error.response?.data?.message || 'Login failed. Please check your credentials.');
         } finally {
             setLoading(false);
         }

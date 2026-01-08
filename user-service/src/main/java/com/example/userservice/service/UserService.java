@@ -4,6 +4,8 @@ import com.example.userservice.dto.RegisterRequest;
 import com.example.userservice.exception.ResourceNotFoundException;
 import com.example.userservice.model.User;
 import com.example.userservice.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @CacheEvict(value = "users", key = "#registerRequest.email")
     public User register(RegisterRequest registerRequest) {
         User user = new User();
         // Use email as username for consistency
@@ -40,6 +43,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Cacheable(value = "users", key = "#username")
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));

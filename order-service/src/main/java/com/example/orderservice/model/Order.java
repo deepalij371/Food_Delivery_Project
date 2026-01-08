@@ -32,7 +32,7 @@ public class Order {
     private Double totalPrice;
     
     @Column(nullable = false)
-    private String status = "PENDING"; // PENDING, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
+    private String status = "PENDING_PAYMENT"; // PENDING_PAYMENT, PAID, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
     
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
@@ -45,6 +45,24 @@ public class Order {
 
     @Column(name = "razorpay_signature")
     private String razorpaySignature;
+
+    @Column(name = "payment_status")
+    private String paymentStatus = "PENDING"; // PENDING, PAID, FAILED, REFUNDED
+
+    @Column(name = "payment_method")
+    private String paymentMethod; // CARD, UPI, COD
+
+    @Column(name = "cancellation_reason")
+    private String cancellationReason;
+
+    @Column(name = "special_instructions", length = 500)
+    private String specialInstructions;
+
+    @Column(name = "estimated_delivery_time")
+    private LocalDateTime estimatedDeliveryTime;
+
+    @Column(name = "actual_delivery_time")
+    private LocalDateTime actualDeliveryTime;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;

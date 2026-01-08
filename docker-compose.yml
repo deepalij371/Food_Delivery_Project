@@ -99,6 +99,14 @@ services:
     networks:
       - food-delivery-network
 
+  redis:
+    image: redis:7.0-alpine
+    container_name: food-delivery-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - food-delivery-network
+
 volumes:
   mysql-data:
 

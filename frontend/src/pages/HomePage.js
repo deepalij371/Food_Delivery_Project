@@ -160,11 +160,23 @@ const HomePage = () => {
           {loading ? (
             <ShimmerList count={8} />
           ) : filteredRestaurants.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {filteredRestaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+            >
+              {filteredRestaurants.map((restaurant, index) => (
+                <motion.div
+                  key={restaurant.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <RestaurantCard restaurant={restaurant} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : (
             <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
               <div className="text-6xl mb-4">🍽️</div>

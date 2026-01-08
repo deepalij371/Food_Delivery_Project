@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiPackage, FiClock } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 const ProfilePage = () => {
@@ -22,7 +22,11 @@ const ProfilePage = () => {
   const fetchOrders = async () => {
     try {
       const response = await axios.get('/api/orders');
-      setOrders(response.data);
+      if (response.data.success) {
+        setOrders(response.data.data);
+      } else {
+        setOrders([]);
+      }
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.error('Failed to load orders');
@@ -71,7 +75,7 @@ const ProfilePage = () => {
                 <div className="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FiUser className="text-4xl text-primary-500" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800">{user?.name || 'User'}</h2>
+                <h2 className="text-2xl font-bold text-gray-800">{user?.fullName || 'User'}</h2>
                 <p className="text-gray-600 text-sm mt-1">{user?.email}</p>
               </div>
 
@@ -122,164 +126,210 @@ const ProfilePage = () => {
             >
               {/* Tabs */}
               <div className="border-b">
-                <div className="flex">
+                <div className="flex relative">
                   <button
                     onClick={() => setActiveTab('orders')}
-                    className={`flex-1 px-6 py-4 font-semibold transition ${
-                      activeTab === 'orders'
-                        ? 'text-primary-500 border-b-2 border-primary-500'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
+                    className={`flex-1 px-6 py-4 font-bold transition-all duration-300 relative z-10 ${activeTab === 'orders'
+                      ? 'text-primary-500'
+                      : 'text-gray-500 hover:text-gray-700'
+                      }`}
                   >
                     <FiPackage className="inline mr-2" />
                     My Orders
+                    {activeTab === 'orders' && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute bottom-0 left-0 right-0 h-1 bg-primary-500"
+                      />
+                    )}
                   </button>
                   <button
                     onClick={() => setActiveTab('profile')}
-                    className={`flex-1 px-6 py-4 font-semibold transition ${
-                      activeTab === 'profile'
-                        ? 'text-primary-500 border-b-2 border-primary-500'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
+                    className={`flex-1 px-6 py-4 font-bold transition-all duration-300 relative z-10 ${activeTab === 'profile'
+                      ? 'text-primary-500'
+                      : 'text-gray-500 hover:text-gray-700'
+                      }`}
                   >
                     <FiUser className="inline mr-2" />
                     Profile Settings
+                    {activeTab === 'profile' && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute bottom-0 left-0 right-0 h-1 bg-primary-500"
+                      />
+                    )}
                   </button>
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-6">
-                {activeTab === 'orders' && (
-                  <div>
-                    {loading ? (
-                      <div className="text-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-                        <p className="text-gray-600 mt-4">Loading orders...</p>
-                      </div>
-                    ) : orders.length > 0 ? (
-                      <div className="space-y-4">
-                        {orders.map((order) => (
-                          <motion.div
-                            key={order.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
-                          >
-                            <div className="flex justify-between items-start mb-3">
-                              <div>
-                                <h3 className="font-semibold text-gray-800">
-                                  Order #{order.id}
-                                </h3>
-                                <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
-                                  <FiClock className="text-xs" />
-                                  {formatDate(order.createdAt || new Date())}
-                                </p>
+                <AnimatePresence mode="wait">
+                  {activeTab === 'orders' ? (
+                    <motion.div
+                      key="orders"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {loading ? (
+                        <div className="text-center py-12">
+                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
+                          <p className="text-gray-600 mt-4">Loading orders...</p>
+                        </div>
+                      ) : orders.length > 0 ? (
+                        <div className="space-y-4">
+                          {orders.map((order, index) => (
+                            <motion.div
+                              key={order.id}
+                              initial={{ opacity: 0, scale: 0.98 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: index * 0.05 }}
+                              className="border border-gray-100 rounded-xl p-5 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-500/5 transition-all group"
+                            >
+                              <div className="flex justify-between items-start mb-4">
+                                <div>
+                                  <h3 className="font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
+                                    Order #{order.id}
+                                  </h3>
+                                  <p className="text-xs text-gray-500 flex items-center gap-1 mt-1 font-medium">
+                                    <FiClock className="text-xs" />
+                                    {formatDate(order.createdAt || new Date())}
+                                  </p>
+                                </div>
+                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm ${getStatusColor(order.status || 'PENDING')}`}>
+                                  {order.status || 'PENDING'}
+                                </span>
                               </div>
-                              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status || 'PENDING')}`}>
-                                {order.status || 'PENDING'}
-                              </span>
-                            </div>
 
-                            <div className="border-t pt-3">
-                              <p className="text-sm text-gray-600 mb-2">
-                                {order.items?.length || 0} items
-                              </p>
-                              <div className="flex justify-between items-center">
-                                <p className="font-bold text-gray-800">
-                                  Total: ₹{order.totalAmount || 0}
-                                </p>
-                                <button
-                                  onClick={() => navigate(`/order/${order.id}`)}
-                                  className="text-primary-500 hover:text-primary-600 text-sm font-semibold"
-                                >
-                                  View Details →
-                                </button>
+                              <div className="border-t border-gray-50 pt-4 mt-2">
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Total Paid</p>
+                                    <p className="font-black text-xl text-gray-900">
+                                      ₹{order.totalAmount || 0}
+                                    </p>
+                                  </div>
+                                  <button
+                                    onClick={() => navigate(`/order-tracking/${order.id}`)}
+                                    className="bg-gray-50 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-primary-500 hover:text-white transition-all transform active:scale-95"
+                                  >
+                                    Track Order
+                                  </button>
+                                </div>
                               </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                            <FiPackage className="text-4xl text-gray-300" />
+                          </div>
+                          <h3 className="text-2xl font-black text-gray-800 mb-2">
+                            No orders yet
+                          </h3>
+                          <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+                            Your food journey is just beginning! Explore our best restaurants.
+                          </p>
+                          <button
+                            onClick={() => navigate('/')}
+                            className="bg-primary-500 text-white px-10 py-4 rounded-2xl hover:bg-primary-600 transition-all font-black text-lg shadow-xl shadow-primary-500/30 transform hover:-translate-y-1"
+                          >
+                            Browse Restaurants
+                          </button>
+                        </div>
+                      )}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="profile"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <h3 className="text-2xl font-black text-gray-900 mb-8">
+                        Profile Settings
+                      </h3>
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                              Full Name
+                            </label>
+                            <div className="relative">
+                              <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                              <input
+                                type="text"
+                                defaultValue={user?.fullName}
+                                className="w-full pl-11 pr-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold text-gray-800"
+                              />
                             </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-12">
-                        <FiPackage className="text-6xl text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                          No orders yet
-                        </h3>
-                        <p className="text-gray-600 mb-6">
-                          Start ordering from your favorite restaurants
-                        </p>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                              Phone Number
+                            </label>
+                            <div className="relative">
+                              <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                              <input
+                                type="tel"
+                                defaultValue={user?.phone}
+                                className="w-full pl-11 pr-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold text-gray-800"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                            Email Address (Encrypted)
+                          </label>
+                          <div className="relative">
+                            <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                              type="email"
+                              defaultValue={user?.email}
+                              disabled
+                              className="w-full pl-11 pr-4 py-4 bg-gray-100 border-2 border-gray-100 rounded-2xl cursor-not-allowed opacity-60 font-bold text-gray-600"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                            Home Address
+                          </label>
+                          <div className="relative">
+                            <FiMapPin className="absolute left-4 top-4 text-gray-400" />
+                            <textarea
+                              rows="3"
+                              defaultValue={user?.address}
+                              className="w-full pl-11 pr-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold text-gray-800 resize-none"
+                              placeholder="Set your default delivery address"
+                            />
+                          </div>
+                        </div>
+
                         <button
-                          onClick={() => navigate('/')}
-                          className="bg-primary-500 text-white px-8 py-3 rounded-lg hover:bg-primary-600 transition font-semibold"
+                          onClick={() => toast.success('Profile updated successfully!', {
+                            style: {
+                              borderRadius: '16px',
+                              background: '#333',
+                              color: '#fff',
+                            },
+                          })}
+                          className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-5 rounded-2xl hover:from-primary-600 hover:to-primary-700 transition-all font-black text-lg shadow-xl shadow-primary-500/30 transform hover:-translate-y-1 active:scale-95 mt-4"
                         >
-                          Browse Restaurants
+                          Save Profile Changes
                         </button>
                       </div>
-                    )}
-                  </div>
-                )}
-
-                {activeTab === 'profile' && (
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-6">
-                      Profile Settings
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Full Name
-                        </label>
-                        <input
-                          type="text"
-                          defaultValue={user?.name}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          defaultValue={user?.email}
-                          disabled
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Phone
-                        </label>
-                        <input
-                          type="tel"
-                          defaultValue={user?.phone}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Address
-                        </label>
-                        <textarea
-                          rows="3"
-                          defaultValue={user?.address}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        />
-                      </div>
-
-                      <button
-                        onClick={() => toast.success('Profile updated successfully!')}
-                        className="w-full bg-primary-500 text-white py-3 rounded-lg hover:bg-primary-600 transition font-semibold"
-                      >
-                        Save Changes
-                      </button>
-                    </div>
-                  </div>
-                )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
           </div>
