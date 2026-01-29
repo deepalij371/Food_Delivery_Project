@@ -10,6 +10,7 @@ import com.example.userservice.model.User;
 import com.example.userservice.service.CustomUserDetailsService;
 import com.example.userservice.service.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*", maxAge = 3600)
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -49,6 +51,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
+        log.info("Processing login request for email: {}", loginRequest.getEmail());
         // Authenticate using email as username
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
@@ -60,6 +63,7 @@ public class UserController {
         User user = userService.findByUsername(loginRequest.getEmail());
         final String token = jwtUtil.generateToken(userDetails.getUsername(), user.getRole());
         
+        log.info("Login successful for user: {}", userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.success("Login successful", new LoginResponse(token)));
     }
 

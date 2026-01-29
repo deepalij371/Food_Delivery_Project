@@ -1,5 +1,6 @@
 package com.example.orderservice.service;
 
+import com.example.orderservice.event.OrderEventProducer;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.repository.OrderRepository;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,6 +18,9 @@ public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+    
+    @Autowired
+    private OrderEventProducer orderEventProducer;
 
     @CacheEvict(value = "orders_customer", key = "#order.customerId")
     public Order createOrder(Order order) {
@@ -44,7 +48,12 @@ public class OrderService {
                          ", restaurant: " + order.getRestaurantId() + 
                          ", total: " + order.getTotalPrice());
         
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        
+        // Publish ORDER_CREATED event
+        orderEventProducer.publishOrderCreated(savedOrder);
+        
+        return savedOrder;
     }
 
     @Cacheable(value = "order", key = "#id")
@@ -77,8 +86,14 @@ public class OrderService {
     public Order updateOrderStatus(Long id, String status) {
         Order order = getOrderById(id);
         if (order != null) {
+            String oldStatus = order.getStatus();
             order.setStatus(status);
-            return orderRepository.save(order);
+            Order updatedOrder = orderRepository.save(order);
+            
+            // Publish STATUS_UPDATED event
+            orderEventProducer.publishOrderStatusUpdated(updatedOrder, oldStatus, status);
+            
+            return updatedOrder;
         }
         return null;
     }
@@ -90,9 +105,15 @@ public class OrderService {
     public Order assignDeliveryPartner(Long orderId, String deliveryPartnerId) {
         Order order = getOrderById(orderId);
         if (order != null) {
+            String oldStatus = order.getStatus();
             order.setDeliveryPartnerId(deliveryPartnerId);
             order.setStatus("OUT_FOR_DELIVERY");
-            return orderRepository.save(order);
+            Order updatedOrder = orderRepository.save(order);
+            
+            // Publish STATUS_UPDATED event
+            orderEventProducer.publishOrderStatusUpdated(updatedOrder, oldStatus, "OUT_FOR_DELIVERY");
+            
+            return updatedOrder;
         }
         return null;
     }
@@ -105,9 +126,15 @@ public class OrderService {
     public Order completeOrder(Long orderId, String deliveryPartnerId) {
         Order order = getOrderById(orderId);
         if (order != null && deliveryPartnerId.equals(order.getDeliveryPartnerId())) {
+            String oldStatus = order.getStatus();
             order.setStatus("DELIVERED");
             order.setActualDeliveryTime(LocalDateTime.now());
-            return orderRepository.save(order);
+            Order updatedOrder = orderRepository.save(order);
+            
+            // Publish STATUS_UPDATED event
+            orderEventProducer.publishOrderStatusUpdated(updatedOrder, oldStatus, "DELIVERED");
+            
+            return updatedOrder;
         }
         return null;
     }
@@ -134,7 +161,17 @@ public class OrderService {
             }
             
             System.out.println("Updated payment status for order " + orderId + " to " + paymentStatus);
-            return orderRepository.save(order);
+            Order updatedOrder = orderRepository.save(order);
+            
+            // Publish payment events
+            if ("PAID".equals(paymentStatus)) {
+                orderEventProducer.publishPaymentCompleted(updatedOrder, razorpayPaymentId);
+                orderEventProducer.publishOrderConfirmed(updatedOrder);
+            } else if ("FAILED".equals(paymentStatus)) {
+                orderEventProducer.publishPaymentFailed(updatedOrder, razorpayPaymentId, "Payment failed");
+            }
+            
+            return updatedOrder;
         }
         return null;
     }
@@ -151,7 +188,12 @@ public class OrderService {
                 order.setStatus("CANCELLED");
                 order.setCancellationReason(reason);
                 System.out.println("Order " + orderId + " cancelled. Reason: " + reason);
-                return orderRepository.save(order);
+                Order cancelledOrder = orderRepository.save(order);
+                
+                // Publish ORDER_CANCELLED event
+                orderEventProducer.publishOrderCancelled(cancelledOrder, reason);
+                
+                return cancelledOrder;
             } else {
                 throw new IllegalStateException("Cannot cancel order in " + order.getStatus() + " status");
             }

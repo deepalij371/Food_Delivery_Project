@@ -128,8 +128,8 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* Category Section */}
-      <div className="bg-white py-12 shadow-sm">
+      {/* Top Brands / What's on your mind */}
+      <div className="bg-white py-12 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <CategoryCarousel onCategorySelect={(category) => setSearchQuery(category)} />
         </div>

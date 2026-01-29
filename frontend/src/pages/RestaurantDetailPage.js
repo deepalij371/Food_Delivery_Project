@@ -18,6 +18,7 @@ const RestaurantDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isVegOnly, setIsVegOnly] = useState(false);
+  const [menuSearchQuery, setMenuSearchQuery] = useState('');
 
   useEffect(() => {
     fetchRestaurantDetails();
@@ -64,7 +65,9 @@ const RestaurantDetailPage = () => {
   const filteredItems = menuItems.filter(item => {
     const categoryMatch = selectedCategory === 'All' || (item.category || 'Other') === selectedCategory;
     const vegMatch = !isVegOnly || item.isVeg;
-    return categoryMatch && vegMatch;
+    const searchMatch = item.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) ||
+      (item.description && item.description.toLowerCase().includes(menuSearchQuery.toLowerCase()));
+    return categoryMatch && vegMatch && searchMatch;
   });
 
   if (loading) {
@@ -155,38 +158,53 @@ const RestaurantDetailPage = () => {
         </motion.div>
 
         {/* Menu Controls */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 sticky top-16 bg-gray-50/95 backdrop-blur-sm z-30 py-4 border-b border-gray-200">
-          {/* Category Tabs */}
-          <div className="overflow-x-auto">
-            <div className="flex gap-2">
-              {categories.map(category => (
+        <div className="flex flex-col gap-4 mb-6 sticky top-16 bg-gray-50/95 backdrop-blur-sm z-30 py-4 border-b border-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Category Tabs */}
+            <div className="overflow-x-auto">
+              <div className="flex gap-2">
+                {categories.map(category => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`px-4 py-2 rounded-full whitespace-nowrap transition text-sm font-bold ${selectedCategory === category
+                      ? 'bg-gray-800 text-white shadow-md scale-105'
+                      : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
+                      }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Search and Veg Toggle */}
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 md:flex-initial">
+                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search in menu..."
+                  value={menuSearchQuery}
+                  onChange={(e) => setMenuSearchQuery(e.target.value)}
+                  className="pl-9 pr-4 py-2 bg-gray-100 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary-500 w-full md:w-64"
+                />
+              </div>
+
+              <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200 w-fit">
+                <span className="text-xs font-bold text-gray-600 uppercase tracking-tighter">Veg Only</span>
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full whitespace-nowrap transition text-sm font-medium ${selectedCategory === category
-                    ? 'bg-gray-800 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow-sm'
+                  onClick={() => setIsVegOnly(!isVegOnly)}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${isVegOnly ? 'bg-success' : 'bg-gray-200'
                     }`}
                 >
-                  {category}
+                  <span
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isVegOnly ? 'translate-x-5' : 'translate-x-1'
+                      }`}
+                  />
                 </button>
-              ))}
+              </div>
             </div>
-          </div>
-
-          {/* Veg Only Toggle */}
-          <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200 w-fit">
-            <span className="text-sm font-bold text-gray-700">Veg Only</span>
-            <button
-              onClick={() => setIsVegOnly(!isVegOnly)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isVegOnly ? 'bg-success' : 'bg-gray-200'
-                }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isVegOnly ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-              />
-            </button>
           </div>
         </div>
 

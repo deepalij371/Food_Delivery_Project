@@ -5,6 +5,7 @@ import com.example.restaurantservice.model.MenuItem;
 import com.example.restaurantservice.model.Restaurant;
 import com.example.restaurantservice.service.RestaurantService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/restaurants")
 @CrossOrigin(origins = "*", maxAge = 3600)
+@Slf4j
 public class RestaurantController {
 
     @Autowired   
@@ -25,7 +27,7 @@ public class RestaurantController {
             @RequestHeader(value = "X-User-Id", required = false) String userId,
             @RequestHeader(value = "X-User-Role", required = false) String userRole) {
         
-        // Set owner ID from authenticated user
+        log.info("Creating restaurant for owner: {}", userId);
         if (userId != null) {
             restaurant.setOwnerId(userId);
         }
@@ -39,6 +41,7 @@ public class RestaurantController {
     public ResponseEntity<ApiResponse<List<Restaurant>>> getAllRestaurants(
             @RequestParam(required = false) String query,
             @RequestParam(required = false) Boolean isOpen) {
+        log.info("Fetching all restaurants with query: {}", query);
         List<Restaurant> restaurants;
         if (query != null && !query.trim().isEmpty()) {
             restaurants = restaurantService.searchRestaurants(query);
@@ -47,17 +50,10 @@ public class RestaurantController {
         }
         return ResponseEntity.ok(ApiResponse.success(restaurants));
     }
-    
-    @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<Restaurant>>> getAllRestaurantsAdmin(
-            @RequestHeader(value = "X-User-Role", required = false) String userRole) {
-        // Admin endpoint - gateway already checked role
-        List<Restaurant> restaurants = restaurantService.getAllRestaurants();
-        return ResponseEntity.ok(ApiResponse.success(restaurants));
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Restaurant>> getRestaurantById(@PathVariable Long id) {
+        log.info("Fetching restaurant by ID: {}", id);
         Restaurant restaurant = restaurantService.getRestaurantById(id);
         return ResponseEntity.ok(ApiResponse.success(restaurant));
     }
@@ -69,38 +65,23 @@ public class RestaurantController {
             @RequestHeader(value = "X-User-Id", required = false) String userId,
             @RequestHeader(value = "X-User-Role", required = false) String userRole) {
         
-        // Check ownership (unless admin)
+        log.info("Updating restaurant ID: {} by user: {}", id, userId);
         Restaurant existing = restaurantService.getRestaurantById(id);
         if (!"ADMIN".equals(userRole) && !existing.getOwnerId().equals(userId)) {
+            log.warn("Unauthorized attempt to update restaurant: {} by user: {}", id, userId);
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("You can only update your own restaurants"));
         }
         
         restaurant.setId(id);
-        restaurant.setOwnerId(existing.getOwnerId()); // Preserve original owner
+        restaurant.setOwnerId(existing.getOwnerId());
         Restaurant updated = restaurantService.updateRestaurant(restaurant);
         return ResponseEntity.ok(ApiResponse.success("Restaurant updated successfully", updated));
-    }
-    
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteRestaurant(
-            @PathVariable Long id,
-            @RequestHeader(value = "X-User-Id", required = false) String userId,
-            @RequestHeader(value = "X-User-Role", required = false) String userRole) {
-        
-        // Check ownership (unless admin)
-        Restaurant existing = restaurantService.getRestaurantById(id);
-        if (!"ADMIN".equals(userRole) && !existing.getOwnerId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("You can only delete your own restaurants"));
-        }
-        
-        restaurantService.deleteRestaurant(id);
-        return ResponseEntity.ok(ApiResponse.success("Restaurant deleted successfully", null));
     }
 
     @GetMapping("/{id}/menu")
     public ResponseEntity<ApiResponse<List<MenuItem>>> getRestaurantMenu(@PathVariable Long id) {
+        log.info("Fetching menu for restaurant ID: {}", id);
         List<MenuItem> menuItems = restaurantService.getMenuItems(id);
         return ResponseEntity.ok(ApiResponse.success(menuItems));
     }
@@ -112,7 +93,7 @@ public class RestaurantController {
             @RequestHeader(value = "X-User-Id", required = false) String userId,
             @RequestHeader(value = "X-User-Role", required = false) String userRole) {
         
-        // Check ownership (unless admin)
+        log.info("Adding menu item to restaurant: {} by user: {}", id, userId);
         Restaurant existing = restaurantService.getRestaurantById(id);
         if (!"ADMIN".equals(userRole) && !existing.getOwnerId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -125,8 +106,7 @@ public class RestaurantController {
     }
 
     @GetMapping("/health")
-    public ResponseEntity<ApiResponse<String>> health() 
-    {
+    public ResponseEntity<ApiResponse<String>> health() {
         return ResponseEntity.ok(ApiResponse.success("Restaurant service is running"));
     }
 }

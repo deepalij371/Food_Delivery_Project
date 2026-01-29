@@ -1,13 +1,14 @@
 package com.example.orderservice.controller;
 
 import com.example.orderservice.dto.ApiResponse;
-
 import com.example.orderservice.model.Order;
 import com.example.orderservice.service.OrderService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/orders")
 @CrossOrigin(origins = "*", maxAge = 3600)
+@Slf4j
 public class OrderController {
 
     @Autowired
@@ -23,62 +25,26 @@ public class OrderController {
     // Customer: Create order
     @PostMapping
     public ResponseEntity<ApiResponse<Order>> createOrder(
-            @RequestBody Order order,
+            @Valid @RequestBody Order order,
             @RequestHeader(value = "X-User-Id", required = false) String userId,
-            @RequestHeader(value = "X-User-Role", required = false) String userRole,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+            @RequestHeader(value = "X-User-Role", required = false) String userRole) {
         
-        System.out.println("========== ORDER CREATION REQUEST ==========");
-        System.out.println("📥 Received order creation request");
-        System.out.println("🔑 Headers received:");
-        System.out.println("   - X-User-Id: " + (userId != null ? userId : "MISSING"));
-        System.out.println("   - X-User-Role: " + (userRole != null ? userRole : "MISSING"));
-        System.out.println("   - Authorization: " + (authHeader != null ? "Present (length: " + authHeader.length() + ")" : "MISSING"));
-        System.out.println("📦 Order details:");
-        System.out.println("   - Restaurant ID: " + order.getRestaurantId());
-        System.out.println("   - Items count: " + (order.getItems() != null ? order.getItems().size() : 0));
-        System.out.println("   - Total price: " + order.getTotalPrice());
-        System.out.println("   - Delivery address: " + (order.getDeliveryAddress() != null ? order.getDeliveryAddress().substring(0, Math.min(50, order.getDeliveryAddress().length())) + "..." : "NULL"));
+        log.info("Received order creation request from User: {}", userId);
         
         // Validate user authentication
         if (userId == null || userId.isEmpty()) {
-            System.out.println("🔴 AUTHENTICATION FAILED: X-User-Id header is missing");
+            log.warn("Authentication failed: X-User-Id header is missing");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error("Please login to place an order"));
         }
-        
-        System.out.println("✅ Authentication validated: User ID = " + userId);
-        
-        // Validate order data
-        if (order.getRestaurantId() == null) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("Restaurant ID is required"));
-        }
-        if (order.getItems() == null || order.getItems().isEmpty()) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("Order must contain at least one item"));
-        }
-        if (order.getDeliveryAddress() == null || order.getDeliveryAddress().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("Delivery address is required"));
-        }
-        if (order.getTotalPrice() == null || order.getTotalPrice() <= 0) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("Invalid order total"));
-        }
-        
-        System.out.println("✅ All validations passed");
         
         // Set customer ID from authenticated user
         order.setCustomerId(userId);
         
         // Create the order
-        System.out.println("💾 Creating order in database...");
         Order created = orderService.createOrder(order);
         
-        System.out.println("✅ ORDER CREATED SUCCESSFULLY");
-        System.out.println("   - Order ID: " + created.getId());
-        System.out.println("   - Customer ID: " + userId);
-        System.out.println("   - Restaurant ID: " + order.getRestaurantId());
-        System.out.println("   - Total: ₹" + order.getTotalPrice());
-        System.out.println("   - Status: " + created.getStatus());
-        System.out.println("============================================");
+        log.info("Order created successfully with ID: {}", created.getId());
         
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Order created successfully", created));
     }

@@ -1,6 +1,7 @@
 package com.example.userservice.service;
 
 import com.example.userservice.dto.RegisterRequest;
+import com.example.userservice.event.UserEventProducer;
 import com.example.userservice.exception.ResourceNotFoundException;
 import com.example.userservice.model.User;
 import com.example.userservice.repository.UserRepository;
@@ -15,6 +16,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private UserEventProducer userEventProducer;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -40,7 +44,12 @@ public class UserService {
             user.setRole(registerRequest.getRole());
         }
         
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        
+        // Publish USER_REGISTERED event
+        userEventProducer.publishUserRegistered(savedUser);
+        
+        return savedUser;
     }
 
     @Cacheable(value = "users", key = "#username")
